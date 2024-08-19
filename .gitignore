@@ -3,7 +3,7 @@
 
 
 .env
-.envall
+.env all
 ### Node ###
 # Logs
 logs
