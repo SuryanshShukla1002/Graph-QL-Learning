@@ -3,7 +3,7 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import dotenv from "dotenv";
 import { schema } from "./graphQL/schema/schema.js";
 import { connectDB } from "./database/database.js";
-import mongoose from "mongoose";
+import { getALLUsers } from "./controllers/user.js";
 dotenv.config({ path: "./.env" });
 export const envMode = process.env.NODE_ENV?.trim() || "DEVELOPMENT";
 const port = Number(process.env.PORT) || 3000;
@@ -15,11 +15,7 @@ const server = new ApolloServer({
         Query: {
             hello: () => "Hello world",
             wow: () => "Hye bro",
-            users: async () => {
-                const users = await mongoose.models.User.find();
-                console.log(users);
-                return users;
-            },
+            users: getALLUsers,
         },
     },
 });
