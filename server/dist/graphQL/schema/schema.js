@@ -13,9 +13,34 @@ type User {
     updatedAt:String,
 }
 
+type Course {
+    _id: ID!
+    title: String!,
+    description:String!,
+    instructor:User!,
+    category:String!,
+    subCategory:String!,,
+    language:String!,,
+    price:Int!,
+    whatwillyoulearn:[String!]!
+}
+
+type Lecture {
+    _id: ID!,
+    title: String!,
+    description:String!,
+    isPublished:Boolean!,
+    isPreview:Boolean!
+    createdAt:String,
+    updatedAt:String,
+}
+
+
 type Query {
-hello: String,
-wow:String,
 users:[User]
+courses:[Course]
+course(id:ID!):[Course]
+lectures:[Lecture]
+# sections:[Section]
 }
 `;
