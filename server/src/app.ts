@@ -9,6 +9,8 @@ import dotenv from "dotenv";
 import { schema } from "./graphQL/schema/schema.js";
 import { connectDB } from "./database/database.js";
 import mongoose from "mongoose";
+import { getALLUsers, getUserByID } from "./controllers/user.js";
+import { getAllCourses, getAllCoursesByID } from "./controllers/course.js";
 
 dotenv.config({ path: "./.env" });
 
@@ -22,13 +24,18 @@ const server = new ApolloServer({
   typeDefs: schema,
   resolvers: {
     Query: {
-      hello: () => "Hello world",
-      wow: () => "Hye bro",
-      users: async () => {
-         const users = await mongoose.models.User.find();
-         console.log(users);
-         return users
-         
+      users: getALLUsers,
+      courses: getAllCourses,
+      course: getAllCoursesByID,
+    },
+    Course: {
+      instructor: async (parent) => {
+        return await getUserByID(parent.instructor);
+      },
+      Lecture: {
+        videoUrl: (lecture: any) => {
+          console.log(lecture.videoUrl);
+        },
       },
     },
   },
