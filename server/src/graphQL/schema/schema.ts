@@ -1,4 +1,5 @@
-export const schema = `#graphql
+import { Course } from "./../../models/courseModel";
+export const graphQLschema = `#graphql
 
 type User {
     _id: ID!
@@ -25,11 +26,26 @@ type Course {
     whatwillyoulearn:[String!]!
 }
 
+type Lecture {
+    _id: ID!,
+    title: String!,
+    description:String!,
+    isPublished:Boolean!,
+    isPreview:Boolean!
+    createdAt:String,
+    updatedAt:String,
+}
+
+type Mutation {
+    newUser(name:String!,age:Int!,gender:String!):String
+}
+
 
 type Query {
 users:[User]
 courses:[Course]
+course(id:ID!):[Course]
+lectures:[Lecture]
 # sections:[Section]
-# lectures:[Lectures]
 }
 `;
