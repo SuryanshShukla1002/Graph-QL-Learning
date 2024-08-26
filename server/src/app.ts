@@ -1,16 +1,15 @@
-import express from "express";
+import express, { NextFunction } from "express";
 import cors from "cors";
 import { errorMiddleware } from "./middlewares/error.js";
 import morgan from "morgan";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
-
+import { expressMiddleware } from "@apollo/server/express4";
 import dotenv from "dotenv";
-import { schema } from "./graphQL/schema/schema.js";
+// import { schema } from "./graphQL/schema/schema.js";
 import { connectDB } from "./database/database.js";
-import mongoose from "mongoose";
-import { getALLUsers, getUserByID } from "./controllers/user.js";
-import { getAllCourses, getAllCoursesByID } from "./controllers/course.js";
+import { graphQLResolver } from "./graphQL/resolvers/resolver.js";
+import { connectGraphQl } from "./graphQL/graphql.js";
 
 dotenv.config({ path: "./.env" });
 
@@ -19,52 +18,29 @@ const port = Number(process.env.PORT) || 3000;
 const mongoURI = process.env.MONGO_URI!;
 
 connectDB(mongoURI);
+const graphqlServer = connectGraphQl();
+await graphqlServer.start();
 
-const server = new ApolloServer({
-  typeDefs: schema,
-  resolvers: {
-    Query: {
-      users: getALLUsers,
-      courses: getAllCourses,
-      course: getAllCoursesByID,
-    },
-    Course: {
-      instructor: async (parent) => {
-        return await getUserByID(parent.instructor);
-      },
-      Lecture: {
-        videoUrl: (lecture: any) => {
-          console.log(lecture.videoUrl);
-        },
-      },
-    },
-  },
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: " * ", credentials: true }));
+app.use(morgan("dev"));
+
+// for authentication of user 
+// const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+//   const user = { role: "admin" };
+
+//   if (user.role === "admin") next();
+//   else  res.send("Bhag yaha se ");
+// };
+
+app.use("/graphql",  expressMiddleware(graphqlServer));
+
+app.get("/", (req, res) => {
+  res.send("Hello, World!");
 });
-
-startStandaloneServer(server, {
-  listen: {
-    port,
-  },
-})
-  .then(() => {
-    console.log(
-      "Server is working on port:" + port + " in " + envMode + " Mode. "
-    );
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
-// const app = express();
-
-//  app.use(express.json());
-// app.use(express.urlencoded({extended: true}));
-// app.use(cors({origin:' * ',credentials:true}));
-// app.use(morgan('dev'))
-
-//   app.get('/', (req, res) => {
-//     res.send('Hello, World!');
-//   });
 
 // your routes here
 
@@ -75,6 +51,8 @@ startStandaloneServer(server, {
 //   });
 // });
 
-// app.use(errorMiddleware);
+app.use(errorMiddleware);
 
-// app.listen(port, () => console.log('Server is working on Port:'+port+' in '+envMode+' Mode.'));
+app.listen(port, () =>
+  console.log("Server is working on Port:" + port + " in " + envMode + " Mode.")
+);
