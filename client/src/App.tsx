@@ -1,8 +1,12 @@
-import { gql, useLazyQuery, useQuery } from "@apollo/client"
-import { getUsers } from "./graphql/query/query";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client"
+import { addUser, getUsers } from "./graphql/query/query";
 
 const App = () => {
-const [ getCourses, {loading, data , error }] = useLazyQuery(gql(getUsers));
+const [ viewUsers, {loading, data , error }] = useLazyQuery(gql(getUsers));
+
+const [add, {data: addUserResponse} ] = useMutation(gql(addUser))
+console.log(addUserResponse);
+
 
 if(error) return <h1>Some Error</h1>
 console.log(data);
@@ -12,7 +16,8 @@ return loading ? (
     <div>
       <h1>WOW</h1>
       {data?.courses[0]?.title}
-      <button onClick={() => getCourses()}>View Course</button>
+      <button onClick={() => viewUsers()}>View Users</button>
+      <button onClick={() => add({variables:{}})}>Add Users</button>
     </div>
   )
 }
