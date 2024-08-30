@@ -11,7 +11,7 @@ return loading ? (
 ) : (
     <div>
       <h1>WOW</h1>
-
+      {data?.courses[0]?.title}
       <button onClick={() => getCourses()}>View Course</button>
     </div>
   )
